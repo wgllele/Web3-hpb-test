@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.hpb.web3.abi.datatypes.Address;
-import io.hpb.web3.abi.datatypes.DynamicArray;
-import io.hpb.web3.abi.datatypes.generated.Bytes32;
 import io.hpb.web3.contract.HpbNodes;
 import io.hpb.web3.crypto.Credentials;
 import io.hpb.web3.crypto.RawTransaction;
@@ -29,8 +26,9 @@ import io.hpb.web3.protocol.core.methods.response.HpbGetTransactionReceipt;
 import io.hpb.web3.protocol.core.methods.response.HpbSendTransaction;
 import io.hpb.web3.protocol.core.methods.response.TransactionReceipt;
 import io.hpb.web3.tuples.generated.Tuple4;
-import io.hpb.web3.tx.ChainId;
+import io.hpb.web3.tx.ChainIdLong;
 import io.hpb.web3.tx.RawTransactionManager;
+import io.hpb.web3.tx.gas.StaticGasProvider;
 import io.hpb.web3.utils.Convert;
 import io.hpb.web3.utils.Numeric;
 import io.swagger.annotations.ApiOperation;
@@ -40,7 +38,7 @@ import io.swagger.annotations.ApiOperation;
 public class HpbWeb3Controller{
 	private static Log log = LogFactory.getLog(HpbWeb3Controller.class);
 	private final long WEB3J_TIMEOUT = 3;
-	private final String contractAddr = "0x7be6aa25600feed355b79b6a4e14dcdb0bd529cb";
+	private final String contractAddr = "0x2251a2533556e7c6243a73f015eb96aa155c5791";
 	private final BigInteger gasPrice = Convert.toWei("18", Convert.Unit.GWEI).toBigInteger();
 	private final BigInteger gasLimit = new BigInteger("95000000");
 	@Autowired
@@ -107,7 +105,7 @@ public class HpbWeb3Controller{
 			String keystore =reqStrList.get(0);
 			String password =reqStrList.get(1);
 			Credentials credentials = WalletUtils.loadCredentials(password, keystore);
-			RawTransactionManager transactionManager=new RawTransactionManager(admin, credentials, ChainId.MAINNET);
+			RawTransactionManager transactionManager=new RawTransactionManager(admin, credentials, ChainIdLong.MAINNET);
 			HpbGetTransactionCount transactionCount = admin.hpbGetTransactionCount(credentials.getAddress(), 
 					DefaultBlockParameterName.PENDING).sendAsync().get(WEB3J_TIMEOUT, TimeUnit.MINUTES);
 			BigInteger nonce = transactionCount.getTransactionCount();
@@ -135,17 +133,17 @@ public class HpbWeb3Controller{
 			String keystore =reqStrList.get(0);
 			String password =reqStrList.get(1);
 			Credentials credentials = WalletUtils.loadCredentials(password, keystore);
-			RawTransactionManager transactionManager=new RawTransactionManager(admin, credentials, ChainId.MAINNET);
-			HpbNodes hpbNodes = HpbNodes.load(contractAddr, admin, transactionManager, gasPrice, gasLimit);
+			RawTransactionManager transactionManager=new RawTransactionManager(admin, credentials, ChainIdLong.MAINNET);
+			HpbNodes hpbNodes = HpbNodes.load(contractAddr, admin, transactionManager,new StaticGasProvider(gasPrice, gasLimit));
 			//Call HpbNodes Smart Contract
-			Tuple4<DynamicArray<Address>, DynamicArray<Bytes32>, DynamicArray<Bytes32>, DynamicArray<Bytes32>> send = 
+			Tuple4<List<String>, List<byte[]>, List<byte[]>, List<byte[]>> send = 
 					hpbNodes.getAllHpbNodes().send();
-			Bytes32 bytes32 = send.getValue2().getValue().get(1);
-			log.info(Numeric.toHexStringNoPrefix(bytes32.getValue()));
-			Bytes32 bytes321 = send.getValue3().getValue().get(1);
-			log.info(Numeric.toHexStringNoPrefix(bytes321.getValue()));
-			Bytes32 bytes322 = send.getValue3().getValue().get(1);
-			log.info(Numeric.toHexStringNoPrefix(bytes322.getValue()));
+			byte[] bytes32 = send.getValue2().get(1);
+			log.info(Numeric.toHexStringNoPrefix(bytes32));
+			byte[] bytes321 = send.getValue3().get(1);
+			log.info(Numeric.toHexStringNoPrefix(bytes321));
+			byte[] bytes322 = send.getValue4().get(1);
+			log.info(Numeric.toHexStringNoPrefix(bytes322));
 			list.add(send);
 		}
 		return list;

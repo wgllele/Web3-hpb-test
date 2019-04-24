@@ -23,7 +23,7 @@ import io.hpb.web3.common.SpringBootContext;
 @EnableAsync
 @EnableWebSecurity
 @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class})
-@ComponentScan(basePackages = "io.hpb.web3.")
+@ComponentScan(basePackages = "io.hpb.web3")
 public class Web3HpbTestApplication {
 
 	public static void main(String[] args) {
