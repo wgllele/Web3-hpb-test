@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>io.hpb.web3</groupId>
 			<artifactId>web3-hpb</artifactId>
-			<version>4.0.0</version>
+			<version>4.0.1</version>
 		</dependency>
 
 		<dependency>
