@@ -27,7 +27,7 @@ public class TestContract {
 		Admin admin=admin("https://192.168.0.121:8545/");
 		Credentials credentials=Credentials.create("**************************************************");
 		RawTransactionManager transactionManager=new RawTransactionManager(admin, credentials, ChainIdLong.MAINNET);
-		BigInteger gasPrice = Convert.toWei("1", Convert.Unit.GWEI).toBigInteger();
+		BigInteger gasPrice = Convert.toWei("18", Convert.Unit.GWEI).toBigInteger();
 		BigInteger gasLimit = new BigInteger("7500000");
 		StaticGasProvider contractGasProvider=new StaticGasProvider(gasPrice,gasLimit);
 		UFOToken token = UFOToken.load("0xfbbe0ba33812b531aced666d0bb2450216c11d11", admin, transactionManager, contractGasProvider);
